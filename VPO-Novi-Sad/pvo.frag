@@ -4,16 +4,17 @@ in vec2 chTex;
 out vec4 outCol;
 
 uniform sampler2D uTex;
+uniform vec4 circleColor;
 
 void main()
 {
     float distance = length(chTex - vec2(0.5, 0.25));
 
-    float radius = 0.05;
+    float circleRadius = 0.03;
 
-    if (distance <= radius)
+    if (distance < circleRadius)
     {
-        outCol = vec4(0.0, 1.0, 0.0, 1.0); // Green color
+        outCol = circleColor;
     }
     else
     {

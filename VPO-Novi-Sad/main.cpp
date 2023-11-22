@@ -31,8 +31,8 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow* window;
-    unsigned int wWidth = 1507;
-    unsigned int wHeight = 757;
+    unsigned int wWidth = 900;
+    unsigned int wHeight = 900;
     const char wTitle[] = "Protiv-vazdusna odbrana Novog Sada";
     window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL);
     
@@ -55,17 +55,20 @@ int main(void)
     unsigned int unifiedShader = createShader("pvo.vert", "pvo.frag");
 
     float vertices[] = {
-        -1.0, -1.0,  0.0, 0.0,
-        1.0, -1.0,   1.0, 0.0,
-        -1.0, 1.0,   0.0, 1.0,
+    -1.0, -1.0,  0.0, 0.0,
+     1.0, -1.0,  1.0, 0.0,
+    -1.0,  1.0,  0.0, 1.0,
 
-        1.0, -1.0,   1.0, 0.0,
-        1.0, 1.0,    1.0, 1.0
-        };
+     1.0, -1.0,  1.0, 0.0,
+     1.0,  1.0,  1.0, 1.0
+    };
+
 
     unsigned int stride = (2 + 2) * sizeof(float);
 
     unsigned int VAO;
+    
+
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     unsigned int VBO;
@@ -79,6 +82,8 @@ int main(void)
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+  
     
     //Tekstura
     unsigned mapTexture = loadImageToTexture("res/novi-sad.png");
@@ -95,12 +100,11 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
-        
+
         glClearColor(0.5, 0.5, 0.5, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -113,9 +117,13 @@ int main(void)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
         glBindTexture(GL_TEXTURE_2D, 0);
 
+        GLuint circleColorLoc = glGetUniformLocation(unifiedShader, "circleColor");
+        glUniform4f(circleColorLoc, 0.0f, 1.0f, 0.0f, 1.0f); // Green color
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
 
 
     glDeleteTextures(1, &mapTexture);
