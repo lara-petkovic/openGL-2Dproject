@@ -1,0 +1,8 @@
+C:\Users\Laptop\Desktop\faks\IV godina\Racunarska grafika\V5\RG V5\Teksture\x64\Debug\glew32.dll
+C:\Users\Laptop\Desktop\faks\IV godina\Racunarska grafika\V5\RG V5\Teksture\x64\Debug\Sablon.exe
+C:\Users\Laptop\Desktop\RG V5\Teksture\x64\Debug\glew32.dll
+C:\Users\Laptop\Desktop\RG V5\Teksture\x64\Debug\Sablon.exe
+C:\Users\Laptop\Desktop\VPO-Novi-Sad\x64\Debug\glew32.dll
+C:\Users\Laptop\Desktop\VPO-Novi-Sad\x64\Debug\Sablon.exe
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\x64\Debug\glew32.dll
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\x64\Debug\Sablon.exe
