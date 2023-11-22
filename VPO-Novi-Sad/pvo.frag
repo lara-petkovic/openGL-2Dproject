@@ -8,13 +8,51 @@ uniform vec4 circleColor;
 
 void main()
 {
-    float distance = length(chTex - vec2(0.5, 0.25));
+    float distanceCenter = length(chTex - vec2(0.5, 0.25)); // base
+    float circleRadiusCenter = 0.03;
 
-    float circleRadius = 0.03;
+    float distance1 = length(chTex - vec2(0.95, 0.1));
+    float circleRadius1 = 0.013;
 
-    if (distance < circleRadius)
+    float distance2 = length(chTex - vec2(0.92, 0.1));
+    float circleRadius2 = 0.013;
+
+    float distance3 = length(chTex - vec2(0.89, 0.1));
+    float circleRadius3 = 0.013;
+
+    float distance4 = length(chTex - vec2(0.86, 0.1));
+    float circleRadius4 = 0.013;
+
+    float distance5 = length(chTex - vec2(0.83, 0.1));
+    float circleRadius5 = 0.013;
+
+    float distance6 = length(chTex - vec2(0.80, 0.1));
+    float circleRadius6 = 0.013;
+
+    float distance7 = length(chTex - vec2(0.77, 0.1));
+    float circleRadius7 = 0.013;
+
+    float distanceCityCenter = length(chTex - vec2(0.71, 0.53));
+    float circleRadiusCityCenter = 0.007;
+
+    // Adjust horizontal distance between circles
+    float horizontalDistance = 0.04;
+
+    if (distanceCenter < circleRadiusCenter ||
+        distance1 < circleRadius1 ||
+        distance2 < circleRadius2 ||
+        distance3 < circleRadius3 ||
+        distance4 < circleRadius4 ||
+        distance5 < circleRadius5 ||
+        distance6 < circleRadius6 ||
+        distance7 < circleRadius7)
     {
         outCol = circleColor;
+    }
+    else if (distanceCityCenter < circleRadiusCityCenter)
+    {
+        // Set color for the city center dot (black color)
+        outCol = vec4(0.0, 0.0, 0.0, 1.0);
     }
     else
     {

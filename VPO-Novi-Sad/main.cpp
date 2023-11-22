@@ -88,7 +88,6 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-  
     
     //Tekstura
     unsigned mapTexture = loadImageToTexture("res/novi-sad.png");
@@ -128,7 +127,6 @@ int main(void)
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
 
     glDeleteTextures(1, &mapTexture);
