@@ -34,7 +34,12 @@ int main(void)
     unsigned int wWidth = 900;
     unsigned int wHeight = 900;
     const char wTitle[] = "Protiv-vazdusna odbrana Novog Sada";
+    GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+    int xPos = (mode->width - wWidth) / 2;
+    int yPos = (mode->height - wHeight) / 2;
     window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL);
+    glfwSetWindowPos(window, xPos, yPos);
     
     if (window == NULL)
     {
