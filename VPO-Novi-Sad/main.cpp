@@ -105,7 +105,7 @@ int main(void)
     glUniform1i(uTexLoc, 0);
  
     float pointRadii[5] = { 0.015, 0.015, 0.015, 0.015, 0.015 };
-    float pointSpeeds[5] = { 0.00005, 0.00006, 0.00007, 0.00008, 0.00009 };
+    float pointSpeeds[5] = { 0.000024, 0.000024, 0.000024, 0.000024, 0.000024 };
     float pointColorTimers[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 }; // Sve taèke poèinju pulsiranje istovremeno
 
 
