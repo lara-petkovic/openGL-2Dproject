@@ -19,16 +19,28 @@ unsigned int compileShader(GLenum type, const char* source);
 unsigned int createShader(const char* vsSource, const char* fsSource);
 static unsigned loadImageToTexture(const char* filePath);
 
+bool isSpacePressed = false;
+bool wasSpacePressed = false;
+glm::vec2 blueCirclePosition(0.0, 0.0);
+float blueCircleRadius = 0.013;
+
+void handleSpaceKeyPress(GLFWwindow* window);
+void updateBlueCirclePosition(GLFWwindow* window);
+void resetPointPosition(glm::vec2& position, float& speed);
+
+float dronSpeed = 0.000024 * 3.0;
+
 int main(void)
 {
     srand(static_cast<unsigned>(time(nullptr)));
 
     if (!glfwInit())
     {
-        std::cout<<"Greska prilikom ucitavanja GLFW biblioteke!\n";
+        std::cout << "Error initializing GLFW library!\n";
         return 1;
     }
 
+    // GLFW window setup
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -36,63 +48,63 @@ int main(void)
     GLFWwindow* window;
     unsigned int wWidth = 900;
     unsigned int wHeight = 900;
-    const char wTitle[] = "Protiv-vazdusna odbrana Novog Sada";
+    const char wTitle[] = "Anti-aircraft defense of Novi Sad";
     GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
     int xPos = (mode->width - wWidth) / 2;
     int yPos = (mode->height - wHeight) / 2;
-    window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL);
+    window = glfwCreateWindow(wWidth, wHeight, wTitle, nullptr, nullptr);
     glfwSetWindowPos(window, xPos, yPos);
-    
-    if (window == NULL)
+
+    if (window == nullptr)
     {
-        std::cout << "Prozor nije napravljen! :(\n";
+        std::cout << "Failed to create window! :(\n";
         glfwTerminate();
         return 2;
     }
 
     glfwMakeContextCurrent(window);
 
-
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Greska prilikom ucitavanja GLEW biblioteke!\n";
+        std::cout << "Error initializing GLEW library!\n";
         return 3;
     }
 
     unsigned int unifiedShader = createShader("pvo.vert", "pvo.frag");
 
+    // Vertex data
     float vertices[] = {
-    -1.0, -1.0,  0.0, 0.0,
-     1.0, -1.0,  1.0, 0.0,
-    -1.0,  1.0,  0.0, 1.0,
+        -1.0, -1.0,  0.0, 0.0,
+         1.0, -1.0,  1.0, 0.0,
+        -1.0,  1.0,  0.0, 1.0,
 
-     1.0, -1.0,  1.0, 0.0,
-     1.0,  1.0,  1.0, 1.0
+         1.0, -1.0,  1.0, 0.0,
+         1.0,  1.0,  1.0, 1.0
     };
-
 
     unsigned int stride = (2 + 2) * sizeof(float);
 
     unsigned int VAO;
-    
-
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
+
+    // Vertex Buffer Object (VBO) setup
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-   
+
+    // Vertex attribute pointers
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    
-    //Tekstura
+    // Texture setup
     unsigned mapTexture = loadImageToTexture("res/novi-sad.png");
     glBindTexture(GL_TEXTURE_2D, mapTexture);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -101,13 +113,15 @@ int main(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D, 0);
+
     unsigned uTexLoc = glGetUniformLocation(unifiedShader, "uTex");
     glUniform1i(uTexLoc, 0);
- 
+
+    // Initializations for points
     float pointRadii[5] = { 0.015, 0.015, 0.015, 0.015, 0.015 };
     float pointSpeeds[5] = { 0.000024, 0.000024, 0.000024, 0.000024, 0.000024 };
-    float pointColorTimers[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 }; // Sve taèke poèinju pulsiranje istovremeno
-
+    
+    float pointColorTimers[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
 
     glm::vec2 pointPositions[5];
     for (int i = 0; i < 5; ++i) {
@@ -115,8 +129,6 @@ int main(void)
         pointPositions[i].y = (rand() % 100) / 100.0;
     }
 
-
-    // Postavljamo uniformne promenljive za pulsirajuæe taèke
     glUniform2fv(glGetUniformLocation(unifiedShader, "pointPositions"), 5, &pointPositions[0].x);
     glUniform1fv(glGetUniformLocation(unifiedShader, "pointRadii"), 5, pointRadii);
     glUniform1fv(glGetUniformLocation(unifiedShader, "pointSpeeds"), 5, pointSpeeds);
@@ -127,6 +139,9 @@ int main(void)
     GLuint pointSpeedsLocation = glGetUniformLocation(unifiedShader, "pointSpeeds");
     GLuint pointColorTimersLocation = glGetUniformLocation(unifiedShader, "pointColorTimers");
 
+    glUseProgram(unifiedShader);
+    GLuint blueCirclePositionLocation = glGetUniformLocation(unifiedShader, "blueCirclePosition");
+    glUniform2fv(blueCirclePositionLocation, 1, &blueCirclePosition[0]);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -134,6 +149,17 @@ int main(void)
         {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
+
+        handleSpaceKeyPress(window);
+
+        if (isSpacePressed)
+        {
+            updateBlueCirclePosition(window);
+        }
+
+        glUseProgram(unifiedShader);
+        glUniform1i(glGetUniformLocation(unifiedShader, "isSpacePressed"), isSpacePressed);
+        glUniform2fv(blueCirclePositionLocation, 1, &blueCirclePosition.x);
 
         glClearColor(0.5, 0.5, 0.5, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -147,14 +173,11 @@ int main(void)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        GLuint circleColorLoc = glGetUniformLocation(unifiedShader, "circleColor");
-        glUniform4f(circleColorLoc, 0.0f, 1.0f, 0.0f, 1.0f); // Green color
-
+        glUniform4f(glGetUniformLocation(unifiedShader, "circleColor"), 0.0f, 1.0f, 0.0f, 1.0f); // Green color
         glUniform2fv(pointPositionsLocation, 5, &pointPositions[0].x);
         glUniform1fv(pointRadiiLocation, 5, pointRadii);
         glUniform1fv(pointSpeedsLocation, 5, pointSpeeds);
         glUniform1fv(pointColorTimersLocation, 5, pointColorTimers);
-
 
         const float deltaTime = 0.016;
         for (int i = 0; i < 5; ++i) {
@@ -162,48 +185,14 @@ int main(void)
         }
 
         glUniform1fv(pointColorTimersLocation, 5, pointColorTimers);
-        // Update helicopter positions to appear from random edges and move towards the city center
-        for (int i = 0; i < 5; ++i)
-        {
-            if (pointPositions[i].x < -1.0 || pointPositions[i].x > 1.0 || pointPositions[i].y < -1.0 || pointPositions[i].y > 1.0)
-            {
-                // Reset position when the point goes out of the screen
-                int edge = rand() % 4;  // Randomly select one of the four edges (0: top, 1: right, 2: bottom, 3: left)
 
-                switch (edge)
-                {
-                case 0:  // Top edge
-                    pointPositions[i].x = (rand() % 100) / 100.0;  // Random x-coordinate
-                    pointPositions[i].y = 1.0;  // Top edge
-                    break;
-                case 1:  // Right edge
-                    pointPositions[i].x = 1.0;  // Right edge
-                    pointPositions[i].y = (rand() % 100) / 100.0;  // Random y-coordinate
-                    break;
-                case 2:  // Bottom edge
-                    pointPositions[i].x = (rand() % 100) / 100.0;  // Random x-coordinate
-                    pointPositions[i].y = -1.0;  // Bottom edge
-                    break;
-                case 3:  // Left edge
-                    pointPositions[i].x = -1.0;  // Left edge
-                    pointPositions[i].y = (rand() % 100) / 100.0;  // Random y-coordinate
-                    break;
-                }
-            }
-            else
-            {
-                // Move towards the city center
-                glm::vec2 cityCenter(0.71, 0.53);
-                glm::vec2 direction = glm::normalize(cityCenter - pointPositions[i]);
-                pointPositions[i] += direction * pointSpeeds[i];
-            }
+        for (int i = 0; i < 5; ++i) {
+            resetPointPosition(pointPositions[i], pointSpeeds[i]);
         }
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     glDeleteTextures(1, &mapTexture);
     glDeleteBuffers(1, &VBO);
@@ -213,6 +202,77 @@ int main(void)
     glfwTerminate();
     return 0;
 }
+
+// Function to handle space key press
+void handleSpaceKeyPress(GLFWwindow* window) {
+    bool spaceKeyState = glfwGetKey(window, GLFW_KEY_SPACE);
+    if (spaceKeyState == GLFW_PRESS && !wasSpacePressed)
+    {
+        isSpacePressed = !isSpacePressed;  // Invert the current status
+        if (isSpacePressed)
+        {
+            blueCirclePosition = glm::vec2(0.5, 0.25);
+        }
+    }
+    wasSpacePressed = spaceKeyState == GLFW_PRESS;
+}
+
+// Function to update blue circle position based on arrow key presses
+void updateBlueCirclePosition(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        blueCirclePosition.x -= dronSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        blueCirclePosition.x += dronSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        blueCirclePosition.y += dronSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        blueCirclePosition.y -= dronSpeed;
+    }
+}
+
+// Function to reset point position when it goes out of the screen
+void resetPointPosition(glm::vec2& position, float& speed) {
+    if (position.x < -1.0 || position.x > 1.0 || position.y < -1.0 || position.y > 1.0)
+    {
+        // Reset position when the point goes out of the screen
+        int edge = rand() % 4;
+
+        switch (edge)
+        {
+        case 0:
+            position.x = (rand() % 100) / 100.0;
+            position.y = 1.0;
+            break;
+        case 1:
+            position.x = 1.0;
+            position.y = (rand() % 100) / 100.0;
+            break;
+        case 2:
+            position.x = (rand() % 100) / 100.0;
+            position.y = -1.0;
+            break;
+        case 3:
+            position.x = -1.0;
+            position.y = (rand() % 100) / 100.0;
+            break;
+        }
+    }
+    else
+    {
+        // Move towards the city center
+        glm::vec2 cityCenter(0.71, 0.53);
+        glm::vec2 direction = glm::normalize(cityCenter - position);
+        position += direction * speed;
+    }
+}
+
 
 unsigned int compileShader(GLenum type, const char* source)
 {

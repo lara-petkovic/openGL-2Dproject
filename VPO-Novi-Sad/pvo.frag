@@ -12,6 +12,9 @@ uniform float pointRadii[5];
 uniform float pointSpeeds[5];
 uniform float pointColorTimers[5];
 
+uniform int isSpacePressed;
+uniform vec2 blueCirclePosition;
+
 void main()
 {
     float distanceCenter = length(chTex - vec2(0.5, 0.25)); // base
@@ -43,6 +46,22 @@ void main()
 
     // Adjust horizontal distance between circles
     float horizontalDistance = 0.04;
+
+    float distanceBlueCircle; // Declare distanceBlueCircle outside the conditional block
+
+    /// Crtanje plavog kruga ako je taster Space pritisnut
+    if (isSpacePressed == 1)
+    {
+        // Assign value to distanceBlueCircle
+        distanceBlueCircle = length(chTex - blueCirclePosition);
+
+        if (distanceBlueCircle < 0.013)
+        {
+            outCol = vec4(0.0, 0.0, 1.0, 1.0);
+            return;
+        }
+    }
+
 
     // Ažuriranje pulsirajuæih taèaka
     for (int i = 0; i < 5; ++i) {
