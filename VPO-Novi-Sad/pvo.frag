@@ -44,23 +44,24 @@ void main()
     // Adjust horizontal distance between circles
     float horizontalDistance = 0.04;
 
-
+    // Ažuriranje pulsirajuæih taèaka
     for (int i = 0; i < 5; ++i) {
-        // Raèunanje distance izmeðu taèke i piksela
         float distancePoint = length(chTex - pointPositions[i]);
-        float pulsatingColor = 0.5 + 0.5 * sin(pointColorTimers[i] * distancePoint);
 
+        // Calculate pulsation speed based on the distance from the city center
+        float dynamicPulsationSpeed = pointSpeeds[i] * (1.0 - distancePoint);
+
+        float pulsatingColor = 0.5 + 0.5 * sin(pointColorTimers[i] + distancePoint * dynamicPulsationSpeed);
 
         // Ako je piksel unutar radijusa pulsirajuæe taèke
         if (distancePoint < pointRadii[i])
         {
-            // Pulsacija boje od crvene do bele i nazad
-            vec3 pulsatingColorRGB = vec3(1.0, pulsatingColor, pulsatingColor);
+            // Pulsacija boje od crvene ka beloj
+            vec3 pulsatingColorRGB = vec3(1.0, 1.0 - pulsatingColor, 1.0 - pulsatingColor);
             outCol = vec4(pulsatingColorRGB, 1.0);
-            return; // Koristimo 'return' umesto 'break' kako bismo odmah prekinuli funkciju
+            return;
         }
     }
-
 
     if (distanceCenter < circleRadiusCenter ||
         distance1 < circleRadius1 ||

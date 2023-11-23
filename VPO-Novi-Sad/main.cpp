@@ -111,10 +111,9 @@ int main(void)
 
     glm::vec2 pointPositions[5];
     for (int i = 0; i < 5; ++i) {
-        pointPositions[i].x = 1.0;  // Start from the right edge
-        pointPositions[i].y = (rand() % 100) / 100.0;  // Random y-coordinate
+        pointPositions[i].x = (rand() % 100) / 100.0;
+        pointPositions[i].y = (rand() % 100) / 100.0;
     }
-
 
 
     // Postavljamo uniformne promenljive za pulsirajuæe taèke
@@ -155,10 +154,18 @@ int main(void)
         glUniform1fv(pointRadiiLocation, 5, pointRadii);
         glUniform1fv(pointSpeedsLocation, 5, pointSpeeds);
         glUniform1fv(pointColorTimersLocation, 5, pointColorTimers);
+
+
+        const float deltaTime = 0.016;
+        for (int i = 0; i < 5; ++i) {
+            pointColorTimers[i] += deltaTime;
+        }
+
+        glUniform1fv(pointColorTimersLocation, 5, pointColorTimers);
         // Update helicopter positions to appear from random edges and move towards the city center
         for (int i = 0; i < 5; ++i)
         {
-            if (pointPositions[i].x < -1.0 || pointPositions[i].y < -1.0)
+            if (pointPositions[i].x < -1.0 || pointPositions[i].x > 1.0 || pointPositions[i].y < -1.0 || pointPositions[i].y > 1.0)
             {
                 // Reset position when the point goes out of the screen
                 int edge = rand() % 4;  // Randomly select one of the four edges (0: top, 1: right, 2: bottom, 3: left)
