@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <ctime>
+#include <glm/glm.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -19,6 +21,7 @@ static unsigned loadImageToTexture(const char* filePath);
 
 int main(void)
 {
+    srand(static_cast<unsigned>(time(nullptr)));
 
     if (!glfwInit())
     {
@@ -101,6 +104,30 @@ int main(void)
     unsigned uTexLoc = glGetUniformLocation(unifiedShader, "uTex");
     glUniform1i(uTexLoc, 0);
  
+    float pointRadii[5] = { 0.015, 0.015, 0.015, 0.015, 0.015 };
+    float pointSpeeds[5] = { 0.00005, 0.00006, 0.00007, 0.00008, 0.00009 };
+    float pointColorTimers[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 }; // Sve taèke poèinju pulsiranje istovremeno
+
+
+    glm::vec2 pointPositions[5];
+    for (int i = 0; i < 5; ++i) {
+        pointPositions[i].x = 1.0;  // Start from the right edge
+        pointPositions[i].y = (rand() % 100) / 100.0;  // Random y-coordinate
+    }
+
+
+
+    // Postavljamo uniformne promenljive za pulsirajuæe taèke
+    glUniform2fv(glGetUniformLocation(unifiedShader, "pointPositions"), 5, &pointPositions[0].x);
+    glUniform1fv(glGetUniformLocation(unifiedShader, "pointRadii"), 5, pointRadii);
+    glUniform1fv(glGetUniformLocation(unifiedShader, "pointSpeeds"), 5, pointSpeeds);
+    glUniform1fv(glGetUniformLocation(unifiedShader, "pointColorTimers"), 5, pointColorTimers);
+
+    GLuint pointPositionsLocation = glGetUniformLocation(unifiedShader, "pointPositions");
+    GLuint pointRadiiLocation = glGetUniformLocation(unifiedShader, "pointRadii");
+    GLuint pointSpeedsLocation = glGetUniformLocation(unifiedShader, "pointSpeeds");
+    GLuint pointColorTimersLocation = glGetUniformLocation(unifiedShader, "pointColorTimers");
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -123,6 +150,48 @@ int main(void)
 
         GLuint circleColorLoc = glGetUniformLocation(unifiedShader, "circleColor");
         glUniform4f(circleColorLoc, 0.0f, 1.0f, 0.0f, 1.0f); // Green color
+
+        glUniform2fv(pointPositionsLocation, 5, &pointPositions[0].x);
+        glUniform1fv(pointRadiiLocation, 5, pointRadii);
+        glUniform1fv(pointSpeedsLocation, 5, pointSpeeds);
+        glUniform1fv(pointColorTimersLocation, 5, pointColorTimers);
+        // Update helicopter positions to appear from random edges and move towards the city center
+        for (int i = 0; i < 5; ++i)
+        {
+            if (pointPositions[i].x < -1.0 || pointPositions[i].y < -1.0)
+            {
+                // Reset position when the point goes out of the screen
+                int edge = rand() % 4;  // Randomly select one of the four edges (0: top, 1: right, 2: bottom, 3: left)
+
+                switch (edge)
+                {
+                case 0:  // Top edge
+                    pointPositions[i].x = (rand() % 100) / 100.0;  // Random x-coordinate
+                    pointPositions[i].y = 1.0;  // Top edge
+                    break;
+                case 1:  // Right edge
+                    pointPositions[i].x = 1.0;  // Right edge
+                    pointPositions[i].y = (rand() % 100) / 100.0;  // Random y-coordinate
+                    break;
+                case 2:  // Bottom edge
+                    pointPositions[i].x = (rand() % 100) / 100.0;  // Random x-coordinate
+                    pointPositions[i].y = -1.0;  // Bottom edge
+                    break;
+                case 3:  // Left edge
+                    pointPositions[i].x = -1.0;  // Left edge
+                    pointPositions[i].y = (rand() % 100) / 100.0;  // Random y-coordinate
+                    break;
+                }
+            }
+            else
+            {
+                // Move towards the city center
+                glm::vec2 cityCenter(0.71, 0.53);
+                glm::vec2 direction = glm::normalize(cityCenter - pointPositions[i]);
+                pointPositions[i] += direction * pointSpeeds[i];
+            }
+        }
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -6,6 +6,12 @@ out vec4 outCol;
 uniform sampler2D uTex;
 uniform vec4 circleColor;
 
+//helicopters
+uniform vec2 pointPositions[5];
+uniform float pointRadii[5];
+uniform float pointSpeeds[5];
+uniform float pointColorTimers[5];
+
 void main()
 {
     float distanceCenter = length(chTex - vec2(0.5, 0.25)); // base
@@ -37,6 +43,24 @@ void main()
 
     // Adjust horizontal distance between circles
     float horizontalDistance = 0.04;
+
+
+    for (int i = 0; i < 5; ++i) {
+        // Raèunanje distance izmeðu taèke i piksela
+        float distancePoint = length(chTex - pointPositions[i]);
+        float pulsatingColor = 0.5 + 0.5 * sin(pointColorTimers[i] * distancePoint);
+
+
+        // Ako je piksel unutar radijusa pulsirajuæe taèke
+        if (distancePoint < pointRadii[i])
+        {
+            // Pulsacija boje od crvene do bele i nazad
+            vec3 pulsatingColorRGB = vec3(1.0, pulsatingColor, pulsatingColor);
+            outCol = vec4(pulsatingColorRGB, 1.0);
+            return; // Koristimo 'return' umesto 'break' kako bismo odmah prekinuli funkciju
+        }
+    }
+
 
     if (distanceCenter < circleRadiusCenter ||
         distance1 < circleRadius1 ||

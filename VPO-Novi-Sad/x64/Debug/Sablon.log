@@ -1,2 +1,37 @@
 ﻿  main.cpp
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(107,29): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(107,36): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(107,43): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(107,50): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(107,57): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(108,30): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(108,39): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(108,48): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(108,57): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(108,66): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(115,46): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(169,58): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(174,58): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(177,58): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\main.cpp(182,58): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
   Sablon.vcxproj -> C:\Users\Laptop\Desktop\openGL-project\openGL-project\VPO-Novi-Sad\x64\Debug\Sablon.exe
