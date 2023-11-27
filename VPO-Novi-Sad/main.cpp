@@ -36,7 +36,7 @@ int main(void)
 
     if (!glfwInit())
     {
-        std::cout << "Error initializing GLFW library!\n";
+        std::cout << "Greska pri inicijalizaciji GLFW biblioteke!\n";
         return 1;
     }
 
@@ -48,7 +48,7 @@ int main(void)
     GLFWwindow* window;
     unsigned int wWidth = 900;
     unsigned int wHeight = 900;
-    const char wTitle[] = "Anti-aircraft defense of Novi Sad";
+    const char wTitle[] = "Protiv-vazdusna odbrana Novog Sada";
     GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
     int xPos = (mode->width - wWidth) / 2;
@@ -58,7 +58,7 @@ int main(void)
 
     if (window == nullptr)
     {
-        std::cout << "Failed to create window! :(\n";
+        std::cout << "Greska pri formiranju prozora!\n";
         glfwTerminate();
         return 2;
     }
@@ -67,13 +67,12 @@ int main(void)
 
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Error initializing GLEW library!\n";
+        std::cout << "Greska pri inicijalizaciji GLEW biblioteke!\n";
         return 3;
     }
 
     unsigned int unifiedShader = createShader("pvo.vert", "pvo.frag");
 
-    // Vertex data
     float vertices[] = {
         -1.0, -1.0,  0.0, 0.0,
          1.0, -1.0,  1.0, 0.0,
@@ -89,7 +88,6 @@ int main(void)
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    // Vertex Buffer Object (VBO) setup
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -166,14 +164,12 @@ int main(void)
 
         glUseProgram(unifiedShader);
         glBindVertexArray(VAO);
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mapTexture);
-
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        glUniform4f(glGetUniformLocation(unifiedShader, "circleColor"), 0.0f, 1.0f, 0.0f, 1.0f); // Green color
+        glUniform4f(glGetUniformLocation(unifiedShader, "circleColor"), 0.0f, 1.0f, 0.0f, 1.0f);
         glUniform2fv(pointPositionsLocation, 5, &pointPositions[0].x);
         glUniform1fv(pointRadiiLocation, 5, pointRadii);
         glUniform1fv(pointSpeedsLocation, 5, pointSpeeds);
@@ -203,12 +199,11 @@ int main(void)
     return 0;
 }
 
-// Function to handle space key press
 void handleSpaceKeyPress(GLFWwindow* window) {
     bool spaceKeyState = glfwGetKey(window, GLFW_KEY_SPACE);
     if (spaceKeyState == GLFW_PRESS && !wasSpacePressed)
     {
-        isSpacePressed = !isSpacePressed;  // Invert the current status
+        isSpacePressed = !isSpacePressed;
         if (isSpacePressed)
         {
             blueCirclePosition = glm::vec2(0.5, 0.25);
@@ -217,7 +212,6 @@ void handleSpaceKeyPress(GLFWwindow* window) {
     wasSpacePressed = spaceKeyState == GLFW_PRESS;
 }
 
-// Function to update blue circle position based on arrow key presses
 void updateBlueCirclePosition(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
     {
@@ -237,11 +231,10 @@ void updateBlueCirclePosition(GLFWwindow* window) {
     }
 }
 
-// Function to reset point position when it goes out of the screen
+// Resetovanje pozicije tacke kada izadje iz ekrana
 void resetPointPosition(glm::vec2& position, float& speed) {
     if (position.x < -1.0 || position.x > 1.0 || position.y < -1.0 || position.y > 1.0)
     {
-        // Reset position when the point goes out of the screen
         int edge = rand() % 4;
 
         switch (edge)
@@ -266,88 +259,13 @@ void resetPointPosition(glm::vec2& position, float& speed) {
     }
     else
     {
-        // Move towards the city center
+        // Kretanje prema centru grada
         glm::vec2 cityCenter(0.71, 0.53);
         glm::vec2 direction = glm::normalize(cityCenter - position);
         position += direction * speed;
     }
 }
 
-
-unsigned int compileShader(GLenum type, const char* source)
-{
-    std::string content = "";
-    std::ifstream file(source);
-    std::stringstream ss;
-    if (file.is_open())
-    {
-        ss << file.rdbuf();
-        file.close();
-        std::cout << "Uspesno procitan fajl sa putanje \"" << source << "\"!" << std::endl;
-    }
-    else {
-        ss << "";
-        std::cout << "Greska pri citanju fajla sa putanje \"" << source << "\"!" << std::endl;
-    }
-     std::string temp = ss.str();
-     const char* sourceCode = temp.c_str();
-
-    int shader = glCreateShader(type);
-    
-    int success;
-    char infoLog[512];
-    glShaderSource(shader, 1, &sourceCode, NULL);
-    glCompileShader(shader);
-
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (success == GL_FALSE)
-    {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        if (type == GL_VERTEX_SHADER)
-            printf("VERTEX");
-        else if (type == GL_FRAGMENT_SHADER)
-            printf("FRAGMENT");
-        printf(" sejder ima gresku! Greska: \n");
-        printf(infoLog);
-    }
-    return shader;
-}
-unsigned int createShader(const char* vsSource, const char* fsSource)
-{
-    
-    unsigned int program;
-    unsigned int vertexShader;
-    unsigned int fragmentShader;
-
-    program = glCreateProgram();
-
-    vertexShader = compileShader(GL_VERTEX_SHADER, vsSource);
-    fragmentShader = compileShader(GL_FRAGMENT_SHADER, fsSource);
-
-    
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    int success;
-    char infoLog[512];
-    glGetProgramiv(program, GL_VALIDATE_STATUS, &success);
-    if (success == GL_FALSE)
-    {
-        glGetShaderInfoLog(program, 512, NULL, infoLog);
-        std::cout << "Objedinjeni sejder ima gresku! Greska: \n";
-        std::cout << infoLog << std::endl;
-    }
-
-    glDetachShader(program, vertexShader);
-    glDeleteShader(vertexShader);
-    glDetachShader(program, fragmentShader);
-    glDeleteShader(fragmentShader);
-
-    return program;
-}
 static unsigned loadImageToTexture(const char* filePath) {
     int TextureWidth;
     int TextureHeight;
@@ -379,4 +297,80 @@ static unsigned loadImageToTexture(const char* filePath) {
         stbi_image_free(ImageData);
         return 0;
     }
+}
+
+unsigned int compileShader(GLenum type, const char* source)
+{
+    std::string content = "";
+    std::ifstream file(source);
+    std::stringstream ss;
+    if (file.is_open())
+    {
+        ss << file.rdbuf();
+        file.close();
+        std::cout << "Uspesno procitan fajl sa putanje \"" << source << "\"!" << std::endl;
+    }
+    else {
+        ss << "";
+        std::cout << "Greska pri citanju fajla sa putanje \"" << source << "\"!" << std::endl;
+    }
+    std::string temp = ss.str();
+    const char* sourceCode = temp.c_str();
+
+    int shader = glCreateShader(type);
+
+    int success;
+    char infoLog[512];
+    glShaderSource(shader, 1, &sourceCode, NULL);
+    glCompileShader(shader);
+
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        if (type == GL_VERTEX_SHADER)
+            printf("VERTEX");
+        else if (type == GL_FRAGMENT_SHADER)
+            printf("FRAGMENT");
+        printf(" sejder ima gresku! Greska: \n");
+        printf(infoLog);
+    }
+    return shader;
+}
+
+unsigned int createShader(const char* vsSource, const char* fsSource)
+{
+
+    unsigned int program;
+    unsigned int vertexShader;
+    unsigned int fragmentShader;
+
+    program = glCreateProgram();
+
+    vertexShader = compileShader(GL_VERTEX_SHADER, vsSource);
+    fragmentShader = compileShader(GL_FRAGMENT_SHADER, fsSource);
+
+
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    int success;
+    char infoLog[512];
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        glGetShaderInfoLog(program, 512, NULL, infoLog);
+        std::cout << "Objedinjeni sejder ima gresku! Greska: \n";
+        std::cout << infoLog << std::endl;
+    }
+
+    glDetachShader(program, vertexShader);
+    glDeleteShader(vertexShader);
+    glDetachShader(program, fragmentShader);
+    glDeleteShader(fragmentShader);
+
+    return program;
 }
