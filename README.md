@@ -41,9 +41,6 @@ The project uses vertex and fragment shader files for rendering. Make sure these
 - The number of remaining drones is displayed using green indicators in the right window corner.
 - As the helicopters draw closer to the city center, their pulsations intensify progressively.
 
-## Author
-- Lara Petković
-
 ## Acknowledgments
 - This project uses the [STB Image](https://github.com/nothings/stb) library for image loading.
 - The game window is created using GLFW, and GLEW is used for OpenGL extensions.
