@@ -1,5 +1,5 @@
-//Autor: Lara Petkoviæ RA 185/2020
-//Opis: Protiv-vazdušna odbrana Novog Sada 
+// Autor: Lara Petkoviæ RA 185/2020
+// Opis: Protiv-vazdušna odbrana Novog Sada 
 
 #define _CRT_SECURE_NO_WARNINGS
 #define CRES 30
@@ -24,8 +24,8 @@
 
 
 unsigned int compileShader(GLenum type, const char* source);
-void configureCircle(float  circle[64], float r, float xPomeraj, float yPomeraj);
 unsigned int createShader(const char* vsSource, const char* fsSource);
+void setCircle(float  circle[64], float r, float xPomeraj, float yPomeraj);
 static unsigned loadImageToTexture(const char* filePath);
 void moveDrone(GLFWwindow* window, float& droneX, float& droneY, float droneSpeed, unsigned int wWidth, unsigned int wHeight);
 void generateHelicopterPositions(int number);
@@ -141,7 +141,7 @@ int main(void)
 
     // Opis baze -----------------------------------------------------------------------
     float baseCircle[CRES * 2 + 4];
-    configureCircle(baseCircle, 0.07, 0.0, -0.45);
+    setCircle(baseCircle, 0.07, 0.0, -0.45);
 
     // VAO i VBO baze
     glBindVertexArray(VAO[1]);
@@ -154,7 +154,7 @@ int main(void)
 
     // Opis centra Novog Sada ----------------------------------------------------------
     float cityCenterCircle[CRES * 2 + 4];
-    configureCircle(cityCenterCircle, 0.017, 0.42, 0.08);
+    setCircle(cityCenterCircle, 0.017, 0.42, 0.08);
 
     // VAO i VBO centra Novog Sada
     glGenVertexArrays(1, &VAO[2]);
@@ -170,7 +170,7 @@ int main(void)
 
     // Opis drona ----------------------------------------------------------------------
     float blueCircle[CRES * 2 + 4];
-    configureCircle(blueCircle, 0.03, 0.0, 0.0);
+    setCircle(blueCircle, 0.03, 0.0, 0.0);
 
     // VAO i VBO drona
     unsigned int VAOBlue, VBOBlue;
@@ -184,9 +184,25 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    // LED sijalica pozadina -> indikator da li je letelica u vazduhu -------------------
+    float LEDBackgroundCircle[CRES * 2 + 4];
+    setCircle(LEDBackgroundCircle, 0.045, -0.85, 0.85);
+
+    // VAO i VBO LED-a
+    unsigned int VAOLEDBackground, VBOLEDBackground;
+    glGenVertexArrays(1, &VAOLEDBackground);
+    glGenBuffers(1, &VBOLEDBackground);
+    glBindVertexArray(VAOLEDBackground);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOLEDBackground);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(LEDBackgroundCircle), LEDBackgroundCircle, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
     // LED sijalica -> indikator da li je letelica u vazduhu ----------------------------
     float LEDCircle[CRES * 2 + 4];
-    configureCircle(LEDCircle, 0.02, -0.85, 0.85);
+    setCircle(LEDCircle, 0.02, -0.85, 0.85);
 
     // VAO i VBO LED-a
     unsigned int VAOLED, VBOLED;
@@ -199,9 +215,9 @@ int main(void)
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
 
-    
+
+
     int dronesLeft = DRONES_LEFT;
     bool wasXpressed = false;
 
@@ -222,7 +238,7 @@ int main(void)
             isMapHidden = false;
         }
 
-        if ((glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !wasXpressed && dronesLeft>0) || isDronOutsideScreen(droneX, droneY)) {
+        if ((glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !wasXpressed && dronesLeft > 0) || isDronOutsideScreen(droneX, droneY)) {
             wasXpressed = true;
             if (!isSpacePressed) {
                 wasSpacePressed = !wasSpacePressed;
@@ -259,15 +275,14 @@ int main(void)
         glUniform3f(colorLoc, 0.0, 1.0, 0.0);
         glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(baseCircle) / (2 * sizeof(float)));
 
-        
 
         // VAO i VBO preostalih dronova
         unsigned int VAOdronLeft[DRONES_LEFT];
         unsigned int VBOdronLeft[DRONES_LEFT];
         float dronLeftCircle[CRES * 2 + 4];
         for (int i = 0; i < dronesLeft; ++i) {
-            
-            configureCircle(dronLeftCircle, 0.02, 0.7 + 0.04 * i, -0.8);
+
+            setCircle(dronLeftCircle, 0.02, 0.7 + 0.04 * i, -0.8);
 
             glGenVertexArrays(1, &VAOdronLeft[i]);
             glGenBuffers(1, &VBOdronLeft[i]);
@@ -285,7 +300,17 @@ int main(void)
             colorLoc = glGetUniformLocation(baseShader, "color");
             glUniform3f(colorLoc, 0.0, 1.0, 0.0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(dronLeftCircle) / (2 * sizeof(float)));
+
+            glDeleteVertexArrays(1, &VAOdronLeft[i]); // Brisemo VAO i VBO odmah nakon njihovog koriscenja
+            glDeleteBuffers(1, &VBOdronLeft[i]);
         }
+
+        // Renderovanje pozadine LED sijalice
+        glUseProgram(baseShader);
+        glBindVertexArray(VAOLEDBackground);
+        colorLoc = glGetUniformLocation(baseShader, "color");
+        glUniform3f(colorLoc, 0.3, 0.2, 0.2);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(LEDBackgroundCircle) / (2 * sizeof(float)));
 
         // Renderovanje LED sijalice -> upaljena ako postoji letelica u vazduhu
         glBindVertexArray(VAOLED);
@@ -305,7 +330,7 @@ int main(void)
         glUniform3f(colorLoc, 0.0, 0.0, 0.0);
         glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(cityCenterCircle) / (2 * sizeof(float)));
 
-        
+
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             if (!isSpacePressed) {
                 wasSpacePressed = !wasSpacePressed;
@@ -339,14 +364,14 @@ int main(void)
             float dirX = 0.42 - helicopterPositions[i].x;
             float dirY = 0.08 - helicopterPositions[i].y;
 
-            // Izraèunamo razdaljinu od koptera do centra
+            // Izraèunamo razdaljinu od koptera do centra - Pitagora
             float distance = sqrt(dirX * dirX + dirY * dirY);
 
             // Normalizujemo vektor
             dirX /= distance;
             dirY /= distance;
 
-            // Prilagodimo brzinu pulsiranja na osnovu udaljenosti od centra
+            // Prilagodimo brzinu pulsiranja na osnovu udaljenosti od centra - osnovna brzina je 5.0f
             float pulseSpeed = 5.0f + 10.0f * (1.0f - distance);
 
             // Izraèunamo faktor pulsiranja na osnovu vremena i udaljenosti
@@ -377,12 +402,11 @@ int main(void)
             }
         }
 
-        moveHelicoptersTowardsCityCenter(0.42, 0.08, droneSpeed/3);
+        moveHelicoptersTowardsCityCenter(0.42, 0.08, droneSpeed / 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     glDeleteTextures(1, &mapTexture);
     glDeleteBuffers(3, VBO);
@@ -391,6 +415,8 @@ int main(void)
     glDeleteVertexArrays(1, &VAOBlue);
     glDeleteBuffers(1, &VBOLED);
     glDeleteVertexArrays(1, &VAOLED);
+    glDeleteBuffers(1, &VBOLEDBackground);
+    glDeleteVertexArrays(1, &VAOLEDBackground);
     glDeleteProgram(unifiedShader);
     glDeleteProgram(baseShader);
 
@@ -487,7 +513,7 @@ void moveDrone(GLFWwindow* window, float& droneX, float& droneY, float droneSpee
     }
 }
 
-void configureCircle(float  circle[64], float r, float xPomeraj, float yPomeraj)
+void setCircle(float  circle[64], float r, float xPomeraj, float yPomeraj)
 {
     float centerX = 0.0;
     float centerY = 0.0;
