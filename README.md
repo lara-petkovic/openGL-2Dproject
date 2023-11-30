@@ -1,7 +1,7 @@
-# Air defense of Novi Sad game
+# Air defense game
 
 ## Overview
-This project is a simple air defense game in OpenGL which involves defending the city of Novi Sad from enemy helicopters. The player controls a drone and must destroy incoming enemy helicopters.
+This project is a simple air defense game in OpenGL that involves defending the city of Novi Sad from enemy helicopters. The player controls a drone and must destroy incoming enemy helicopters.
 
 ## Prerequisites
 Make sure you have the following NuGet packages installed before running the project:
@@ -19,7 +19,7 @@ Make sure you have the following NuGet packages installed before running the pro
 - **Esc Key:** Escape
 
 ## How to Play
-1. Launch the game and hit Space key to activate the dron.
+1. Launch the game and hit the Space key to activate the drone.
 2. Use arrow keys to move the drone.
 3. Press the space key to reset the drone position if needed.
 4. Use the X key to destroy the drone (limited uses).
