@@ -217,8 +217,27 @@ int main(void)
     glBindVertexArray(0);
 
 
-
     int dronesLeft = DRONES_LEFT;
+
+    // VAO i VBO preostalih dronova -----------------------------------------------------
+    unsigned int VAOdronLeft[DRONES_LEFT];
+    unsigned int VBOdronLeft[DRONES_LEFT];
+    float dronLeftCircle[CRES * 2 + 4];
+    for (int i = 0; i < dronesLeft; ++i) {
+
+        setCircle(dronLeftCircle, 0.02, 0.7 + 0.04 * i, -0.8);
+
+        glGenVertexArrays(1, &VAOdronLeft[i]);
+        glGenBuffers(1, &VBOdronLeft[i]);
+        glBindVertexArray(VAOdronLeft[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOdronLeft[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dronLeftCircle), dronLeftCircle, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    
     bool wasXpressed = false;
 
     while (!glfwWindowShouldClose(window))
@@ -276,33 +295,12 @@ int main(void)
         glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(baseCircle) / (2 * sizeof(float)));
 
 
-        // VAO i VBO preostalih dronova
-        unsigned int VAOdronLeft[DRONES_LEFT];
-        unsigned int VBOdronLeft[DRONES_LEFT];
-        float dronLeftCircle[CRES * 2 + 4];
-        for (int i = 0; i < dronesLeft; ++i) {
-
-            setCircle(dronLeftCircle, 0.02, 0.7 + 0.04 * i, -0.8);
-
-            glGenVertexArrays(1, &VAOdronLeft[i]);
-            glGenBuffers(1, &VBOdronLeft[i]);
-            glBindVertexArray(VAOdronLeft[i]);
-            glBindBuffer(GL_ARRAY_BUFFER, VBOdronLeft[i]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(dronLeftCircle), dronLeftCircle, GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
-        }
         // Crtanje preostalih dronova
         for (int i = 0; i < dronesLeft; ++i) {
             glBindVertexArray(VAOdronLeft[i]);
             colorLoc = glGetUniformLocation(baseShader, "color");
             glUniform3f(colorLoc, 0.0, 1.0, 0.0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(dronLeftCircle) / (2 * sizeof(float)));
-
-            glDeleteVertexArrays(1, &VAOdronLeft[i]); // Brisemo VAO i VBO odmah nakon njihovog koriscenja
-            glDeleteBuffers(1, &VBOdronLeft[i]);
         }
 
         // Renderovanje pozadine LED sijalice
@@ -419,6 +417,11 @@ int main(void)
     glDeleteVertexArrays(1, &VAOLEDBackground);
     glDeleteProgram(unifiedShader);
     glDeleteProgram(baseShader);
+
+    for (int i = 0; i < DRONES_LEFT; i++) {
+        glDeleteVertexArrays(1, &VAOdronLeft[i]);
+        glDeleteBuffers(1, &VBOdronLeft[i]);
+    }
 
     glfwTerminate();
     return 0;
