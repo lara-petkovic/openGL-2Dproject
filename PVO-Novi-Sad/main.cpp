@@ -17,10 +17,8 @@
 
 // Za koptere
 #include <ctime>
-#include <glm/glm.hpp>
 #include <random>
 #include <chrono>
-//
 
 
 unsigned int compileShader(GLenum type, const char* source);
