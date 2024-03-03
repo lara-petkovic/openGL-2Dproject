@@ -43,3 +43,6 @@ The project uses vertex and fragment shader files for rendering. Make sure these
 ## Acknowledgments
 - This project uses the [STB Image](https://github.com/nothings/stb) library for image loading.
 - The game window is created using GLFW, and GLEW is used for OpenGL extensions.
+
+## Appearance of the Application
+![PVO-NS](https://github.com/lara-petkovic/openGL-2Dproject/assets/116621727/3b71c977-2c27-461a-ad25-ac86eda0d02d)
