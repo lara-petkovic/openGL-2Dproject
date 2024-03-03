@@ -46,3 +46,6 @@ The project uses vertex and fragment shader files for rendering. Make sure these
 
 ## Appearance of the Application
 ![PVO-NS](https://github.com/lara-petkovic/openGL-2Dproject/assets/116621727/3b71c977-2c27-461a-ad25-ac86eda0d02d)
+
+## Specification (Serbian)
+![spec](https://github.com/lara-petkovic/openGL-3Dproject/assets/116621727/c558e73e-f886-4012-b6fe-76ee23ef2410)
